@@ -1,30 +1,73 @@
-import { character, episodes } from "../../data/data";
+import { useEffect, useState } from "react";
 import { ArrowUpCircleIcon } from "@heroicons/react/24/solid";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Loader } from "./Loader";
 
-export default function CharacterDetail() {
+export default function CharacterDetail({ selectedId }) {
+  const [character, setCharacter] = useState(null);
+  const [episodes, setEpisodes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const { data } = await axios.get(
+          `https://rickandmortyapi.com/api/character/${selectedId}`
+        );
+        setCharacter(data);
+
+        const episodesId = data.episode.map((e) => e.split("/").at(-1));
+        const { data: episodesData } = await axios.get(
+          `https://rickandmortyapi.com/api/episode/${episodesId}`
+        );
+
+        setEpisodes([episodesData].flat());
+      } catch (error) {
+        setCharacter(null);
+        toast.error(error.response?.data.error || error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (selectedId) fetchData();
+  }, [selectedId]);
+
+  if (isLoading)
+    return (
+      <div style={{ flex: "1" }}>
+        <Loader />
+      </div>
+    );
+
+  if (!character || !selectedId)
+    return (
+      <div style={{ flex: "1", color: "var(--slate-300" }}>
+        Please select a character.
+      </div>
+    );
+
+  const { name, image, gender, status, species } = character;
+
   return (
     <div style={{ flex: "1" }}>
       <div className="character-detail">
-        <img
-          src={character.image}
-          alt={character.name}
-          className="character-detail__img"
-        />
+        <img src={image} alt={name} className="character-detail__img" />
         <div className="character-detail__info">
           <h3 className="name">
-            <span>{character.gender === "Male" ? "👨" : "👧"}</span>
-            <span>{character.name}</span>
+            <span>{gender === "Male" ? "👨" : "👧"}</span>
+            <span>{name}</span>
           </h3>
           <div className="info">
-            <span
-              className={`status ${character.status === "Dead" && "red"}`}
-            ></span>
-            <span>&nbsp;{character.status}</span>
-            <span>&nbsp;{character.species}</span>
+            <span className={`status ${status === "Dead" && "red"}`}></span>
+            <span>&nbsp;{status}</span>
+            <span>&nbsp;{species}</span>
           </div>
           <div className="location">
             <p>Last known location:</p>
-            <p>{character.location.name}</p>
+            <p>{location.name}</p>
           </div>
           <div className="actions">
             <button className="btn btn--primary">Add to Favorite</button>
