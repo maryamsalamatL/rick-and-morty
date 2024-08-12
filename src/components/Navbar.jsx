@@ -5,11 +5,6 @@ export default function Navbar({ numOfResult, children }) {
     <nav className="navbar">
       <div className="navbar__logo">LOGO</div>
       {children}
-      <div className="navbar__result">Found {numOfResult} character</div>
-      <button className="heart">
-        <HeartIcon className="icon" />
-        <span className="badge">4</span>
-      </button>
     </nav>
   );
 }
@@ -23,5 +18,18 @@ export function Search({ query, setQuery }) {
       className="text-field"
       placeholder="Search ..."
     />
+  );
+}
+
+export function SearchResult({ numOfResult }) {
+  return <div className="navbar__result">Found {numOfResult} character</div>;
+}
+
+export function FavoritesIcon({ numOfFavorites }) {
+  return (
+    <button className="heart">
+      <HeartIcon className="icon" />
+      <span className="badge">{numOfFavorites}</span>
+    </button>
   );
 }
