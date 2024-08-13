@@ -20,14 +20,27 @@ export default function App() {
 
   useEffect(() => {
     setIsLoading(true);
+
+    const controller = new AbortController();
+    const signal = controller.signal;
     axios
-      .get(`https://rickandmortyapi.com/api/character/?name=${query}`)
+      .get(`https://rickandmortyapi.com/api/character/?name=${query}`, {
+        signal,
+      })
       .then(({ data }) => setCharacters(data.results))
       .catch((error) => {
-        setCharacters([]);
-        toast.error(error.response.data.error);
+        if (axios.isCancel(error)) {
+          console.log("successfully aborted");
+        } else {
+          setCharacters([]);
+          toast.error(error.response.data.error);
+        }
       })
       .finally(() => setIsLoading(false));
+ 
+    return () => {
+      controller.abort();
+    };
   }, [query]);
 
   const handleAddFavorite = (newCharacter) => {
