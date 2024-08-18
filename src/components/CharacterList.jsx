@@ -4,27 +4,22 @@ export default function CharacterList({ characters, onSelect, selectedId }) {
   return (
     <div className="characters-list">
       {characters.map((item) => (
-        <Character
-          key={item.id}
-          onSelect={onSelect}
-          selectedId={selectedId}
-          {...item}
-        />
+        <Character key={item.id} {...item}>
+          <button
+            className="icon red"
+            onClick={() =>
+              onSelect((prevState) => (prevState === item.id ? null : item.id))
+            }
+          >
+            {selectedId === item.id ? <EyeSlashIcon /> : <EyeIcon />}
+          </button>
+        </Character>
       ))}
     </div>
   );
 }
 
-function Character({
-  id,
-  name,
-  image,
-  gender,
-  status,
-  species,
-  onSelect,
-  selectedId,
-}) {
+export function Character({ name, image, gender, status, species, children }) {
   return (
     <div className="list__item">
       <img src={image} alt={name} />
@@ -37,12 +32,7 @@ function Character({
         <span> {status} - </span>
         <span> {species}</span>
       </div>
-      <button
-        className="icon red"
-        onClick={() => onSelect((prevState) => (prevState === id ? null : id))}
-      >
-        {selectedId === id ? <EyeSlashIcon /> : <EyeIcon />}
-      </button>
+      {children}
     </div>
   );
 }

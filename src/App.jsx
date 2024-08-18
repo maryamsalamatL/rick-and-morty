@@ -16,7 +16,9 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(
+    () => JSON.parse(localStorage.getItem("favorites")) || []
+  );
 
   useEffect(() => {
     setIsLoading(true);
@@ -33,18 +35,26 @@ export default function App() {
           console.log("successfully aborted");
         } else {
           setCharacters([]);
-          toast.error(error.response.data.error);
+          toast.error(error.response?.data.error || error.message);
         }
       })
       .finally(() => setIsLoading(false));
- 
+
     return () => {
       controller.abort();
     };
   }, [query]);
 
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
+
   const handleAddFavorite = (newCharacter) => {
     setFavorites((prevState) => [...prevState, newCharacter]);
+  };
+
+  const handleDeleteFavorite = (id) => {
+    setFavorites((prevState) => prevState.filter((item) => item.id !== id));
   };
 
   const isAddToFavorite = favorites.some((c) => c.id === selectedId);
@@ -55,7 +65,10 @@ export default function App() {
       <Navbar>
         <Search query={query} setQuery={setQuery} />
         <SearchResult numOfResult={characters?.length} />
-        <FavoritesIcon numOfFavorites={favorites.length} />
+        <FavoritesIcon
+          favorites={favorites}
+          onDeleteFavorite={handleDeleteFavorite}
+        />
       </Navbar>
       <div className="main">
         {isLoading ? (
