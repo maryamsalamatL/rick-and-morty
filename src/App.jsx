@@ -6,48 +6,20 @@ import Navbar, {
 } from "./components/Navbar";
 import CharacterList from "./components/CharacterList";
 import CharacterDetail from "./components/CharacterDetail";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader } from "./components/Loader";
-import toast, { Toaster } from "react-hot-toast";
-import axios from "axios";
+import { Toaster } from "react-hot-toast";
+import useCharacters from "./hooks/useCharacters";
+import useLocalStorage from "./hooks/useLocalStorage";
 
 export default function App() {
-  const [characters, setCharacters] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [query, setQuery] = useState("");
-  const [selectedId, setSelectedId] = useState(null);
-  const [favorites, setFavorites] = useState(
-    () => JSON.parse(localStorage.getItem("favorites")) || []
+  const { isLoading, characters } = useCharacters(
+    "https://rickandmortyapi.com/api/character/?name",
+    query
   );
-
-  useEffect(() => {
-    setIsLoading(true);
-
-    const controller = new AbortController();
-    const signal = controller.signal;
-    axios
-      .get(`https://rickandmortyapi.com/api/character/?name=${query}`, {
-        signal,
-      })
-      .then(({ data }) => setCharacters(data.results))
-      .catch((error) => {
-        if (axios.isCancel(error)) {
-          console.log("successfully aborted");
-        } else {
-          setCharacters([]);
-          toast.error(error.response?.data.error || error.message);
-        }
-      })
-      .finally(() => setIsLoading(false));
-
-    return () => {
-      controller.abort();
-    };
-  }, [query]);
-
-  useEffect(() => {
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-  }, [favorites]);
+  const [selectedId, setSelectedId] = useState(null);
+  const [favorites, setFavorites] = useLocalStorage("favorites", []);
 
   const handleAddFavorite = (newCharacter) => {
     setFavorites((prevState) => [...prevState, newCharacter]);
