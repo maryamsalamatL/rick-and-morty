@@ -33,12 +33,13 @@ button {
   border: none;
   outline: none;
 }
+
 .text-field {
   padding: 0.7rem 1rem;
   border-radius: 0.5rem;
   color: var(--slate-100);
   background-color: var(--slate-500);
-  font-size: 1.1rem;
+  font-size: 0.8rem;
 }
 
 .text-field::placeholder {
@@ -78,7 +79,7 @@ button {
   width: 98%;
   min-height: 250px;
   position: absolute;
-  top: 10%;
+  top: 5%;
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: var(--slate-900);
@@ -112,6 +113,11 @@ button {
 @media (min-width: 768px) {
   .modal {
     max-width: 30rem;
+    top: 10%;
+  }
+
+  .text-field {
+    font-size: 1.1rem;
   }
 }
 
